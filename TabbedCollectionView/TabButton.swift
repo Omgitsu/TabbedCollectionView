@@ -15,19 +15,19 @@ class TabButton: UIButton {
         }
     }
     var selectionColor = UIColor(red:0.9, green:0.36, blue:0.13, alpha:1)
-    var titleColor = UIColor.darkTextColor() {
+    var titleColor = UIColor.darkText {
         didSet {
             buildAttributedTitle()
         }
     }
-    private var title = ""
-    private var image = UIImage()
-    private var attributedTitle = NSAttributedString()
+    fileprivate var title = ""
+    fileprivate var image = UIImage()
+    fileprivate var attributedTitle = NSAttributedString()
     
     init(title: String, image: UIImage, color: UIColor) {
         self.title = title
         self.image = image
-        super.init(frame: CGRectZero)
+        super.init(frame: CGRect.zero)
         buildAttributedTitle()
         backgroundColor = bgColor
         tintColor = color
@@ -38,23 +38,23 @@ class TabButton: UIButton {
         backgroundColor = bgColor
     }
     
-    override var highlighted: Bool {
+    override var isHighlighted: Bool {
         get {
-            return super.highlighted
+            return super.isHighlighted
         }
         set {
-            if newValue || selected {
+            if newValue || isSelected {
                 backgroundColor = UIColor(white: 0.87, alpha: 1.0)
             } else {
                 backgroundColor = bgColor
             }
-            super.highlighted = newValue
+            super.isHighlighted = newValue
         }
     }
     
-    override var selected: Bool {
+    override var isSelected: Bool {
         get {
-            return super.selected
+            return super.isSelected
         }
         set {
             if newValue {
@@ -62,33 +62,33 @@ class TabButton: UIButton {
             } else {
                 backgroundColor = bgColor
             }
-            super.selected = newValue
+            super.isSelected = newValue
             setNeedsDisplay()
         }
     }
     
-    override func drawRect(rect: CGRect) {
-        if selected {
+    override func draw(_ rect: CGRect) {
+        if isSelected {
             let underscore = UIBezierPath()
             underscore.lineWidth = 3.0
-            underscore.moveToPoint(CGPoint(x:rect.origin.x, y:rect.size.height))
-            underscore.addLineToPoint(CGPoint(x:rect.size.width, y:rect.size.height))
+            underscore.move(to: CGPoint(x:rect.origin.x, y:rect.size.height))
+            underscore.addLine(to: CGPoint(x:rect.size.width, y:rect.size.height))
             selectionColor.setStroke()
             underscore.stroke()
         }
         
         let imageFrame = CGRect(x: rect.width/2.0 - 8.0, y: 3, width: 16, height: 16)
         self.tintColor.setFill()
-        image.drawInRect(imageFrame)
+        image.draw(in: imageFrame)
         
         let textFrame = CGRect(x: 4, y: 20, width: rect.width - 8, height: 14)
-        attributedTitle.drawInRect(textFrame)
+        attributedTitle.draw(in: textFrame)
     }
     
     func buildAttributedTitle() {
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.alignment = .Center
-        paragraphStyle.lineBreakMode = .ByTruncatingMiddle
+        paragraphStyle.alignment = .center
+        paragraphStyle.lineBreakMode = .byTruncatingMiddle
         let attributes: [String: AnyObject] = [NSForegroundColorAttributeName: titleColor,
             NSFontAttributeName: UIFont(name: "HelveticaNeue-Light", size: 8)!,
             NSParagraphStyleAttributeName: paragraphStyle]

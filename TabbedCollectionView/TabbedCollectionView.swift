@@ -9,51 +9,51 @@
 import UIKit
 
 public protocol TabbedCollectionViewDataSource: class {
-    func collectionView(collectionView: TabbedCollectionView, numberOfItemsInTab tab: Int) -> Int
-    func collectionView(collectionView: TabbedCollectionView, titleForItemAtIndexPath indexPath: NSIndexPath) -> String
-    func collectionView(collectionView: TabbedCollectionView, imageForItemAtIndexPath indexPath: NSIndexPath) -> UIImage
-    func collectionView(collectionView: TabbedCollectionView, colorForItemAtIndexPath indexPath: NSIndexPath) -> UIColor
-    func collectionView(collectionView: TabbedCollectionView, titleColorForItemAtIndexPath indexPath: NSIndexPath) -> UIColor
-    func collectionView(collectionView: TabbedCollectionView, backgroundColorForItemAtIndexPath indexPath: NSIndexPath) -> UIColor
+    func collectionView(_ collectionView: TabbedCollectionView, numberOfItemsInTab tab: Int) -> Int
+    func collectionView(_ collectionView: TabbedCollectionView, titleForItemAtIndexPath indexPath: IndexPath) -> String
+    func collectionView(_ collectionView: TabbedCollectionView, imageForItemAtIndexPath indexPath: IndexPath) -> UIImage
+    func collectionView(_ collectionView: TabbedCollectionView, colorForItemAtIndexPath indexPath: IndexPath) -> UIColor
+    func collectionView(_ collectionView: TabbedCollectionView, titleColorForItemAtIndexPath indexPath: IndexPath) -> UIColor
+    func collectionView(_ collectionView: TabbedCollectionView, backgroundColorForItemAtIndexPath indexPath: IndexPath) -> UIColor
 }
 
 public protocol TabbedCollectionViewDelegate: class {
-    func collectionView(collectionView: TabbedCollectionView, didSelectItemAtIndex index: Int, forTab tab: Int)
+    func collectionView(_ collectionView: TabbedCollectionView, didSelectItemAtIndex index: Int, forTab tab: Int)
 }
 
-@IBDesignable public class TabbedCollectionView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+@IBDesignable open class TabbedCollectionView: UIView, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     var view: UIView!
-    private let tabWidth = 80.0
-    private let tabHeight = 32.0
-    private var tabsInfo = [ItemInfo]()
-    private var buttonTagOffset = 4827
-    private var selectedTab = 0
-    private var currentPage = 0
-    private var cellWidth: CGFloat {
+    fileprivate let tabWidth = 80.0
+    fileprivate let tabHeight = 32.0
+    fileprivate var tabsInfo = [ItemInfo]()
+    fileprivate var buttonTagOffset = 4827
+    fileprivate var selectedTab = 0
+    fileprivate var currentPage = 0
+    fileprivate var cellWidth: CGFloat {
         return collectionView.frame.width / 5.0
     }
-    private var cellHeight: CGFloat {
+    fileprivate var cellHeight: CGFloat {
         return collectionView.frame.height / 3.0
     }
-    private var userInteracted = false
-    private var storedOffset = CGPointZero
+    fileprivate var userInteracted = false
+    fileprivate var storedOffset = CGPoint.zero
     
     @IBOutlet weak var tabsScrollView: UIScrollView!
     @IBOutlet weak var collectionView: UICollectionView!
     
-    public weak var dataSource: TabbedCollectionViewDataSource?
-    public weak var delegate: TabbedCollectionViewDelegate?
-    public var selectionColor = UIColor(red:0.9, green:0.36, blue:0.13, alpha:1.0) {
+    open weak var dataSource: TabbedCollectionViewDataSource?
+    open weak var delegate: TabbedCollectionViewDelegate?
+    open var selectionColor = UIColor(red:0.9, green:0.36, blue:0.13, alpha:1.0) {
         didSet {
             reloadTabs()
         }
     }
-    public var tabTitleColor = UIColor.darkTextColor() {
+    open var tabTitleColor = UIColor.darkText {
         didSet {
             reloadTabs()
         }
     }
-    public var tabBackgroundColor = UIColor(white: 0.95, alpha: 1.0) {
+    open var tabBackgroundColor = UIColor(white: 0.95, alpha: 1.0) {
         didSet {
             reloadTabs()
         }
@@ -69,46 +69,46 @@ public protocol TabbedCollectionViewDelegate: class {
         loadXib()
     }
     
-    public override func awakeFromNib() {
+    open override func awakeFromNib() {
         super.awakeFromNib()
     }
     
-    public func createTabs(items: [ItemInfo]) {
+    open func createTabs(_ items: [ItemInfo]) {
         tabsInfo = items
         reloadTabs()
     }
     
-    public func updateLayout() {
+    open func updateLayout() {
         let layout = HorizontalFlowLayout()
         layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
         collectionView.collectionViewLayout = layout
     }
     
     // MARK: - Private functions
-    private func loadXib() {
+    fileprivate func loadXib() {
         view = loadViewFromNib()
         view.frame = bounds
-        view.autoresizingMask = [UIViewAutoresizing.FlexibleWidth, UIViewAutoresizing.FlexibleHeight]
+        view.autoresizingMask = [UIViewAutoresizing.flexibleWidth, UIViewAutoresizing.flexibleHeight]
         addSubview(view)
         setupCollectionView()
     }
     
-    private func loadViewFromNib() -> UIView {
-        let bundle = NSBundle(forClass: self.dynamicType)
+    fileprivate func loadViewFromNib() -> UIView {
+        let bundle = Bundle(for: type(of: self))
         let nib = UINib(nibName: "TabbedCollectionView", bundle: bundle)
-        let view = nib.instantiateWithOwner(self, options: nil)[0] as! UIView
+        let view = nib.instantiate(withOwner: self, options: nil)[0] as! UIView
         return view
     }
     
-    private func setupCollectionView() {
-        let bundle = NSBundle(forClass: self.dynamicType)
-        collectionView.registerClass(ItemCollectionViewCell.self, forCellWithReuseIdentifier: "ItemCell")
-        collectionView.registerNib(UINib(nibName: "ItemCollectionViewCell", bundle: bundle), forCellWithReuseIdentifier: "ItemCell")
+    fileprivate func setupCollectionView() {
+        let bundle = Bundle(for: type(of: self))
+        collectionView.register(ItemCollectionViewCell.self, forCellWithReuseIdentifier: "ItemCell")
+        collectionView.register(UINib(nibName: "ItemCollectionViewCell", bundle: bundle), forCellWithReuseIdentifier: "ItemCell")
         updateLayout()
         storedOffset = collectionView.contentOffset
     }
     
-    private func reloadTabs() {
+    fileprivate func reloadTabs() {
         let _ = tabsScrollView.subviews.map { $0.removeFromSuperview() }
         var i = 0
         for item in tabsInfo {
@@ -118,23 +118,23 @@ public protocol TabbedCollectionViewDelegate: class {
             button.bgColor = tabBackgroundColor
             button.frame = CGRect(x: (tabWidth * Double(i)), y: 0, width: tabWidth, height: tabHeight)
             button.tag = i + buttonTagOffset
-            button.addTarget(self, action: "tabSelected:", forControlEvents: .TouchUpInside)
+            button.addTarget(self, action: #selector(TabbedCollectionView.tabSelected(_:)), for: .touchUpInside)
             if i == selectedTab {
-                button.selected = true
+                button.isSelected = true
             }
             tabsScrollView.addSubview(button)
-            i++
+            i += 1
         }
         tabsScrollView.contentSize = CGSize(width: Double(i)*tabWidth, height: tabHeight)
     }
     
-    func tabSelected(sender: UIButton) {
+    func tabSelected(_ sender: UIButton) {
         // Deselect previous tab
         if let previousSelected = tabsScrollView.viewWithTag(selectedTab + buttonTagOffset) as? UIButton {
-            previousSelected.selected = false
+            previousSelected.isSelected = false
         }
         // Select current tab
-        sender.selected = true
+        sender.isSelected = true
         selectedTab = sender.tag - buttonTagOffset
         
         // Updated collection view
@@ -143,19 +143,19 @@ public protocol TabbedCollectionViewDelegate: class {
     }
     
     // MARK: - UICollectionView data source methods
-    public func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    open func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
     
-    public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         guard let numItems = dataSource?.collectionView(self, numberOfItemsInTab: selectedTab) else {
             return 0
         }
         return numItems
     }
     
-    public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("ItemCell", forIndexPath: indexPath) as! ItemCollectionViewCell
+    open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ItemCell", for: indexPath) as! ItemCollectionViewCell
         cell.selectionColor = selectionColor
         cell.textLabel.text = dataSource?.collectionView(self, titleForItemAtIndexPath: indexPath)
         cell.imageView.image = dataSource?.collectionView(self, imageForItemAtIndexPath: indexPath)
@@ -166,31 +166,31 @@ public protocol TabbedCollectionViewDelegate: class {
     }
     
     // MARK: - UICollectionView delegate methods
-    public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         delegate?.collectionView(self, didSelectItemAtIndex: indexPath.row, forTab: selectedTab)
     }
     
-    public func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+    open func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: cellWidth, height: cellHeight)
     }
     
-    public func scrollViewWillBeginDragging(scrollView: UIScrollView) {
+    open func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         userInteracted = true
     }
     
-    public func scrollViewDidEndDragging(scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    open func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
             userInteracted = false
             storedOffset = collectionView.contentOffset
         }
     }
     
-    public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
+    open func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         userInteracted = false
         storedOffset = collectionView.contentOffset
     }
     
-    public func scrollViewDidScroll(scrollView: UIScrollView) {
+    open func scrollViewDidScroll(_ scrollView: UIScrollView) {
         if !userInteracted {
             collectionView.contentOffset = storedOffset
         }

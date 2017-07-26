@@ -21,9 +21,9 @@ class ItemCollectionViewCell: UICollectionViewCell {
         // Initialization code
     }
     
-    override var selected: Bool {
+    override var isSelected: Bool {
         get {
-            return super.selected
+            return super.isSelected
         }
         set {
             if newValue {
@@ -38,7 +38,7 @@ class ItemCollectionViewCell: UICollectionViewCell {
                 selectionView.removeFromSuperview()
                 indicatorView.removeFromSuperview()
             }
-            super.selected = newValue
+            super.isSelected = newValue
         }
     }
 }

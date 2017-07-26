@@ -9,20 +9,20 @@
 import UIKit
 
 class HorizontalFlowLayout: UICollectionViewLayout {
-    var itemSize = CGSizeZero {
+    var itemSize = CGSize.zero {
         didSet {
             invalidateLayout()
         }
     }
-    private var cellCount = 0
-    private var boundsSize = CGSizeZero
+    fileprivate var cellCount = 0
+    fileprivate var boundsSize = CGSize.zero
     
-    override func prepareLayout() {
-        cellCount = self.collectionView!.numberOfItemsInSection(0)
+    override func prepare() {
+        cellCount = self.collectionView!.numberOfItems(inSection: 0)
         boundsSize = self.collectionView!.bounds.size
     }
     
-    override func collectionViewContentSize() -> CGSize {
+    override var collectionViewContentSize : CGSize {
         let verticalItemsCount = Int(floor(boundsSize.height / itemSize.height))
         let horizontalItemsCount = Int(floor(boundsSize.width / itemSize.width))
         
@@ -35,25 +35,25 @@ class HorizontalFlowLayout: UICollectionViewLayout {
         return size
     }
     
-    override func layoutAttributesForElementsInRect(rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
+    override func layoutAttributesForElements(in rect: CGRect) -> [UICollectionViewLayoutAttributes]? {
         var allAttributes = [UICollectionViewLayoutAttributes]()
-        for var i = 0; i < cellCount; i++ {
-            let indexPath = NSIndexPath(forRow: i, inSection: 0)
+        for i in 0 ..< cellCount {
+            let indexPath = IndexPath(row: i, section: 0)
             let attr = self.computeLayoutAttributesForCellAtIndexPath(indexPath)
             allAttributes.append(attr)
         }
         return allAttributes
     }
     
-    override func layoutAttributesForItemAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes? {
+    override func layoutAttributesForItem(at indexPath: IndexPath) -> UICollectionViewLayoutAttributes? {
         return self.computeLayoutAttributesForCellAtIndexPath(indexPath)
     }
     
-    override func shouldInvalidateLayoutForBoundsChange(newBounds: CGRect) -> Bool {
-        return !CGSizeEqualToSize(newBounds.size, self.collectionView!.bounds.size)
+    override func shouldInvalidateLayout(forBoundsChange newBounds: CGRect) -> Bool {
+        return !newBounds.size.equalTo(self.collectionView!.bounds.size)
     }
     
-    func computeLayoutAttributesForCellAtIndexPath(indexPath: NSIndexPath) -> UICollectionViewLayoutAttributes {
+    func computeLayoutAttributesForCellAtIndexPath(_ indexPath: IndexPath) -> UICollectionViewLayoutAttributes {
         let row = indexPath.row
         let bounds = self.collectionView!.bounds
         
@@ -65,9 +65,9 @@ class HorizontalFlowLayout: UICollectionViewLayout {
         let rowPosition = (row/horizontalItemsCount)%verticalItemsCount
         let itemPage = Int(floor(Double(row)/Double(itemsPerPage)))
         
-        let attr = UICollectionViewLayoutAttributes(forCellWithIndexPath: indexPath)
+        let attr = UICollectionViewLayoutAttributes(forCellWith: indexPath)
 
-        var frame = CGRectZero
+        var frame = CGRect.zero
         frame.origin.x = CGFloat(itemPage) * bounds.size.width + CGFloat(columnPosition) * itemSize.width
         frame.origin.y = CGFloat(rowPosition) * itemSize.height
         frame.size = itemSize
